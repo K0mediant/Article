@@ -11,12 +11,12 @@ public class ArticleService {
     private ArticleRepo articleRepo;
 
     public Article parseFile(String text) throws Exception {
-        int lines = 1;
+        int lines = 0;
         int pos = 0;
         while ((pos = text.indexOf("\n", pos) + 1) != 0) {
             lines++;
         }
-        if (lines < 2){
+        if (lines < 1){
             throw new Exception("Not enough lines");
         }
         String name = text.substring(0, text.indexOf("\n"));

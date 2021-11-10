@@ -1,7 +1,7 @@
 package com.example.article.service;
 
 import com.example.article.domain.Article;
-import org.apache.tomcat.util.http.fileupload.IOUtils;
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -10,9 +10,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -22,21 +19,23 @@ public class FileService {
     @Autowired
     private ArticleService articleService;
 
-    public Iterable<Article> parseFile(MultipartFile file) throws Exception {
+    public Article parseFile(MultipartFile file) throws Exception {
         ZipInputStream zis = new ZipInputStream(file.getInputStream());
         ZipEntry entry;
-        String files ="";
-        List<Article> articles = new ArrayList<>();
-        while ((entry = zis.getNextEntry()) != null){
-            String type = entry.getName().substring(entry.getName().indexOf(".")+1);
-            if (!type.equals("txt")) {
-                throw new Exception("Wrong file type");
-            }
-            InputStream entryInputStream = getInputStreamForEntry(zis);
-            String fileText = new String(entryInputStream.readAllBytes());
-            articles.add(articleService.parseFile(fileText));
+        Article article;
+        entry = zis.getNextEntry();
+        if (entry == null) {
+            throw new Exception("File is empty");
         }
-        return articles;
+        String fileName = entry.getName();
+        if (!fileName.equals("article.txt")) {
+            throw new Exception("Wrong file type");
+        }
+        InputStream entryInputStream = getInputStreamForEntry(zis);
+        String fileText = new String(IOUtils.toByteArray(entryInputStream));
+        article = articleService.parseFile(fileText);
+
+        return article;
     }
 
     private static InputStream getInputStreamForEntry(ZipInputStream zis) throws IOException {

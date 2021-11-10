@@ -27,14 +27,6 @@ public class GreetingController {
     @Autowired
     private FileService fileService;
 
-    /*@GetMapping("greeting")
-    public String greeting(
-            @RequestParam(name = "name", required = false, defaultValue = "World") String name,
-            Map<String, Object> model
-    ) {
-        model.put("name", name);
-        return "greeting";
-    }*/
 
     @GetMapping
     public String main(Map<String, Object> model) {
@@ -48,20 +40,11 @@ public class GreetingController {
         return "upload";
     }
 
-   /* @PostMapping("/upload")
-    public String add(@RequestParam String text,@RequestParam String name, Map<String, Object> model){
-        Article article = new Article(text, name);
-        articleRepo.save(article);
-        Iterable<Article> articles = articleRepo.findAll();
-        model.put("articles", articles);
-        return "main";
-    }*/
 
     @PostMapping("/uploadFile")
     public String upload(@RequestBody MultipartFile file, Map<String, Object> model) throws Exception {
         //Map<String, Object> model = new HashMap<>();
-        FileService f = new FileService();
-        f.parseFile(file);
+        fileService.parseFile(file);
         Iterable<Article> articles = articleRepo.findAll();
         model.put("articles", articles);
         return "main";
